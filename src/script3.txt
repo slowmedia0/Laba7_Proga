@@ -1,0 +1,22 @@
+help
+info
+show
+sum_of_engine_power
+print_field_ascending_number_of_wheels
+print_field_descending_number_of_wheels
+update 1
+sadad
+1
+2
+60
+4
+SHIP
+PLASMA
+show
+sort
+show
+execute_script src\script1.txt
+reorder
+sum_of_engine_power
+print_field_ascending_number_of_wheels
+print_field_descending_number_of_wheels

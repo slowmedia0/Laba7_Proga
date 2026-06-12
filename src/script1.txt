@@ -1,0 +1,13 @@
+help
+info
+show
+sort
+show
+reorder
+show
+sum_of_engine_power
+remove_by_id 2
+execute_script src\script2.txt
+print_field_ascending_number_of_wheels
+print_field_descending_number_of_wheels
+show
