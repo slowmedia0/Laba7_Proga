@@ -14,11 +14,11 @@ public class Vehicle implements Comparable<Vehicle>, Serializable {
     private VehicleType type;
     private FuelType fuelType;
 
-    // === Новые поля для Лабораторной №7 (минимальное добавление) ===
+    
     private Long ownerId;
     private String ownerLogin;
 
-    // ==================== Конструкторы ====================
+    
 
     public Vehicle(Integer id, String name, Coordinates coordinates, java.time.LocalDate creationDate,
                    float enginePower, Long numberOfWheels, VehicleType type, FuelType fuelType) {
@@ -80,7 +80,7 @@ public class Vehicle implements Comparable<Vehicle>, Serializable {
         System.out.println("ownerLogin: " + this.ownerLogin);
     }
 
-    // ==================== Геттеры и Сеттеры ====================
+    
 
     public Integer getId() {
         return id;
@@ -154,7 +154,7 @@ public class Vehicle implements Comparable<Vehicle>, Serializable {
         this.fuelType = fuelType;
     }
 
-    // ==================== Новые геттеры/сеттеры для ЛР7 ====================
+    
 
     public Long getOwnerId() {
         return ownerId;

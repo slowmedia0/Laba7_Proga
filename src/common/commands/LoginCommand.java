@@ -1,5 +1,6 @@
 package common.commands;
 
+import client.utility.UserHandler;
 import common.ExitCodeCommand;
 import common.utility.ResponseBuilder;
 import server.database.UserDAO;
@@ -46,8 +47,6 @@ public class LoginCommand extends AbstractCommand {
         if (!valid.equals(ExitCodeCommand.OK)) {
             return valid;
         }
-
-        // Проверка: если уже авторизован
         if (CollectionManager.getCurrentUserLogin() != null) {
             ResponseBuilder.append("Вы уже авторизованы как " + CollectionManager.getCurrentUserLogin() +
                     ". Используйте команду 'logout' для смены аккаунта.");
@@ -58,14 +57,14 @@ public class LoginCommand extends AbstractCommand {
             ResponseBuilder.append("Логин и пароль не могут быть пустыми");
             return ExitCodeCommand.ERROR;
         }
-
         common.models.User user = UserDAO.login(login, password);
         if (user != null) {
             CollectionManager.setCurrentUser(login);
-            ResponseBuilder.append("✅ Успешная авторизация как " + login);
+            CollectionManager.setCurrentUserLogin(login);
+            ResponseBuilder.append(" Успешная авторизация как " + login);
             return ExitCodeCommand.OK;
         } else {
-            ResponseBuilder.append("❌ Неверный логин или пароль");
+            ResponseBuilder.append(" Неверный логин или пароль");
             return ExitCodeCommand.ERROR;
         }
     }

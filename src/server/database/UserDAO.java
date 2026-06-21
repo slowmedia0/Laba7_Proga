@@ -19,7 +19,7 @@ public class UserDAO {
             return true;
 
         } catch (SQLException e) {
-            System.err.println("Ошибка регистрации: " + e.getMessage());
+            System.out.println("Ошибка регистрации: " + e.getMessage());
             return false;
         }
     }
@@ -43,7 +43,7 @@ public class UserDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Ошибка авторизации: " + e.getMessage());
+            System.out.println("Ошибка авторизации: " + e.getMessage());
         }
         return null;
     }
@@ -58,14 +58,12 @@ public class UserDAO {
             }
             return sb.toString();
         } catch (Exception e) {
-            System.err.println("Ошибка хэширования: " + e.getMessage());
-            return password; // fallback
+            System.out.println("Ошибка хэширования: " + e.getMessage());
+            return password; 
         }
     }
 
-    /**
-     * Получить ID пользователя по логину
-     */
+    
     public static Long getUserIdByLogin(String login) {
         if (login == null) return null;
 
@@ -82,7 +80,7 @@ public class UserDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Ошибка получения user id: " + e.getMessage());
+            System.out.println("Ошибка получения user id: " + e.getMessage());
         }
         return null;
     }

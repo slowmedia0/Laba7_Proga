@@ -12,8 +12,8 @@ public class Console {
     public ExitCodeCommand exitCodeStatus = ExitCodeCommand.CTRL_C;
 
     private final CommandManger commandManager;
-    private String loadFileName;           // оставлено для совместимости, но не используется
-    private byte[] loadFileData;           // оставлено для совместимости
+    private String loadFileName;           
+    private byte[] loadFileData;           
     private boolean flagScript;
     private boolean flagReadCollection;
 
@@ -33,9 +33,9 @@ public class Console {
     public boolean isFlagScript() { return flagScript; }
     public boolean isFlagReadCollection() { return flagReadCollection; }
 
-    // Метод loadCollection полностью удалён — работаем только с БД
+    
 
-    // Основной метод (для скриптов)
+    
     public ExitCodeCommand launchCommand(String mnemonics, String argument) {
         try {
             if (isEmptyCommand(mnemonics, argument)) {
@@ -53,7 +53,7 @@ public class Console {
         }
     }
 
-    // Перегруженный метод для интерактивного режима + auth
+    
     public ExitCodeCommand launchCommand(String mnemonics, String argument, Vehicle vehicle, String FileName, byte[] FileData, String login, String password) {
         try {
             if (isEmptyCommand(mnemonics, argument)) {

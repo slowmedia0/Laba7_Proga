@@ -9,15 +9,15 @@ public class CommandRequest implements Serializable {
     private Object argument;
     private Vehicle vehicle;
 
-    // === Поля, которые используются в CommandManger ===
-    private String FileName;   // оставлено с большой буквы, как в CommandManger
+    
+    private String FileName;   
     private byte[] FileData;
 
-    // === НОВЫЕ ПОЛЯ ДЛЯ ЛР7 ===
+    
     private String login;
     private String password;
 
-    // ==================== Конструкторы ====================
+    
 
     public CommandRequest(String nameOfCommand) {
         this.nameOfCommand = nameOfCommand;
@@ -39,7 +39,7 @@ public class CommandRequest implements Serializable {
         this.vehicle = vehicle;
     }
 
-    // ==================== Геттеры и Сеттеры ====================
+    
 
     public String getNameOfCommand() {
         return nameOfCommand;
@@ -53,7 +53,7 @@ public class CommandRequest implements Serializable {
         return vehicle;
     }
 
-    // Геттеры для совместимости с CommandManger
+    
     public String getFileName() {
         return FileName;
     }
@@ -70,7 +70,7 @@ public class CommandRequest implements Serializable {
         this.FileData = fileData;
     }
 
-    // Методы, которые используются в RequestHandler
+    
     public String getCommandName() {
         return nameOfCommand;
     }
@@ -83,7 +83,7 @@ public class CommandRequest implements Serializable {
         return vehicle;
     }
 
-    // Авторизация
+    
     public String getLogin() {
         return login;
     }

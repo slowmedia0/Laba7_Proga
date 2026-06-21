@@ -11,12 +11,13 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.Date;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class CollectionManager {
 
-    private Stack<Vehicle> C = new Stack<>();
+    private CopyOnWriteArrayList<Vehicle> C = new CopyOnWriteArrayList<>();
     private LocalDate creationDate;
     private ArrayList<Integer> arrayId = new ArrayList<>();
     private Integer recentId = 0;
@@ -24,7 +25,7 @@ public class CollectionManager {
     private static final ReentrantLock lock = new ReentrantLock();
     private static String currentUserLogin = null;
 
-    // ====================== ЛР7 ======================
+
 
     public void loadFromDatabase() {
         lock.lock();
@@ -44,21 +45,23 @@ public class CollectionManager {
                 this.creationDate = C.get(0).getCreationDate();
             }
 
-            System.out.println("✅ Успешно загружено " + C.size() + " объектов из PostgreSQL.");
+            System.out.println(" Успешно загружено " + C.size() + " объектов из PostgreSQL.");
 
         } catch (Exception e) {
-            System.err.println("Критическая ошибка загрузки из БД: " + e.getMessage());
+            System.out.println("Критическая ошибка загрузки из БД: " + e.getMessage());
         } finally {
             lock.unlock();
         }
     }
 
-    /**
-     * Добавление нового объекта
-     */
+
+    public static void setCurrentUserLogin(String currentUserLogin) {
+        CollectionManager.currentUserLogin = currentUserLogin;
+    }
+
     public static boolean add(Vehicle vehicle, Long ownerId) {
         if (vehicle == null || ownerId == null || vehicle.getCoordinates() == null) {
-            System.err.println("VehicleDAO.add: неверные входные данные");
+            System.out.println("VehicleDAO.add: неверные входные данные");
             return false;
         }
 
@@ -78,7 +81,7 @@ public class CollectionManager {
             ps.setDouble(3, vehicle.getCoordinates().getX());
             ps.setDouble(4, vehicle.getCoordinates().getY());
 
-            // Правильная конвертация LocalDate → java.sql.Date
+
             java.sql.Date sqlDate = vehicle.getCreationDate() != null
                     ? java.sql.Date.valueOf(vehicle.getCreationDate())
                     : java.sql.Date.valueOf(java.time.LocalDate.now());
@@ -98,23 +101,21 @@ public class CollectionManager {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     vehicle.setId(rs.getInt("id"));
-                    System.out.println("✅ Объект успешно добавлен в БД. ID = " + vehicle.getId());
+                    System.out.println(" Объект успешно добавлен в БД. ID = " + vehicle.getId());
                     return true;
                 }
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Ошибка добавления в БД: " + e.getMessage());
+            System.out.println(" Ошибка добавления в БД: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
-    /**
-     * Обновление объекта — только если владелец совпадает
-     */
+
     public static boolean update(Integer id, Vehicle vehicle, Long ownerId) {
         if (id == null || vehicle == null || ownerId == null || vehicle.getCoordinates() == null) {
-            System.err.println("VehicleDAO.update: неверные входные данные");
+            System.out.println("VehicleDAO.update: неверные входные данные");
             return false;
         }
 
@@ -153,30 +154,24 @@ public class CollectionManager {
             int rowsUpdated = ps.executeUpdate();
 
             if (rowsUpdated > 0) {
-                System.out.println("✅ Объект id=" + id + " успешно обновлён в БД");
+                System.out.println(" Объект id=" + id + " успешно обновлён в БД");
                 return true;
             } else {
-                System.out.println("⚠️ Объект id=" + id + " не найден или нет прав на обновление");
+                System.out.println(" Объект id=" + id + " не найден или нет прав на обновление");
                 return false;
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Ошибка обновления в БД: " + e.getMessage());
+            System.out.println(" Ошибка обновления в БД: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    /**
-     * Обновление элемента — сначала в БД, потом в памяти (ЛР7)
-     */
-    /**
-     * Добавление нового объекта — ID приходит из БД
-     */
-    /**
-     * Добавление — только после успеха в БД
-     */
-    public Stack<Vehicle> addToCollection(Vehicle vehicle) {
+
+
+
+    public CopyOnWriteArrayList<Vehicle> addToCollection(Vehicle vehicle) {
         if (vehicle == null) return C;
 
         Long ownerId = getCurrentUserId();
@@ -194,7 +189,7 @@ public class CollectionManager {
                 initializeArrayId();
                 ResponseBuilder.append("Элемент успешно добавлен в коллекцию. Присвоен id = " + vehicle.getId());
 
-                VehicleDAO.resetSequence();   // ← сброс
+                VehicleDAO.resetSequence();
             } finally {
                 lock.unlock();
             }
@@ -204,10 +199,8 @@ public class CollectionManager {
         return C;
     }
 
-    /**
-     * Обновление элемента — сначала в БД, потом в памяти (ЛР7)
-     */
-    public Stack<Vehicle> updateElementById(Integer id, Vehicle newVehicle) {
+
+    public CopyOnWriteArrayList<Vehicle> updateElementById(Integer id, Vehicle newVehicle) {
         if (newVehicle == null || id == null) {
             ResponseBuilder.append("Неверные данные для обновления");
             return C;
@@ -236,7 +229,7 @@ public class CollectionManager {
                 initializeArrayId();
                 ResponseBuilder.append("Элемент с id = " + id + " успешно обновлён");
 
-                VehicleDAO.resetSequence();   // ← сброс
+                VehicleDAO.resetSequence();
             } finally {
                 lock.unlock();
             }
@@ -246,17 +239,15 @@ public class CollectionManager {
         return C;
     }
 
-    /**
-     * Сохраняет всю текущую коллекцию в БД (полная синхронизация)
-     */
+
     public boolean saveToDatabase() {
         lock.lock();
         try {
-            System.out.println("💾 Сохранение коллекции в БД...");
+            System.out.println(" Сохранение коллекции в БД...");
             boolean result = VehicleDAO.saveAll(C);
             if (result) {
-                VehicleDAO.resetSequence();   // ← сброс
-                System.out.println("✅ Коллекция успешно сохранена");
+                VehicleDAO.resetSequence();
+                System.out.println(" Коллекция успешно сохранена");
             }
             return result;
         } finally {
@@ -264,7 +255,7 @@ public class CollectionManager {
         }
     }
 
-    public Stack<Vehicle> removeById(Integer id) {
+    public CopyOnWriteArrayList<Vehicle> removeById(Integer id) {
         if (id == null) {
             ResponseBuilder.append("Не указан id");
             return C;
@@ -283,7 +274,7 @@ public class CollectionManager {
                 arrayId.remove(id);
                 ResponseBuilder.append("Элемент с id = " + id + " успешно удалён.");
 
-                VehicleDAO.resetSequence();   // ← сброс
+                VehicleDAO.resetSequence();
             } finally {
                 lock.unlock();
             }
@@ -293,14 +284,9 @@ public class CollectionManager {
         return C;
     }
 
-    /**
-     * Clear — удаляем только объекты текущего пользователя
-     * (из памяти и из БД)
-     */
-    /**
-     * Clear — удаляем ТОЛЬКО объекты текущего пользователя
-     */
-    public Stack<Vehicle> clearCollection() {
+
+
+    public CopyOnWriteArrayList<Vehicle> clearCollection() {
         String currentLogin = getCurrentUserLogin();
         Long ownerId = getCurrentUserId();
 
@@ -315,7 +301,7 @@ public class CollectionManager {
                 C.removeIf(vehicle -> currentLogin.equals(vehicle.getOwnerLogin()));
                 initializeArrayId();
 
-                VehicleDAO.resetSequence();   // ← сброс
+                VehicleDAO.resetSequence();
 
                 ResponseBuilder.append("Коллекция пользователя успешно очищена.");
             } finally {
@@ -327,7 +313,7 @@ public class CollectionManager {
         return C;
     }
 
-    public Stack<Vehicle> removeGreater(Vehicle element) {
+    public CopyOnWriteArrayList<Vehicle> removeGreater(Vehicle element) {
         if (element == null) return C;
 
         Long ownerId = getCurrentUserId();
@@ -344,7 +330,7 @@ public class CollectionManager {
                         v.compareTo(element) > 0);
                 initializeArrayId();
 
-                VehicleDAO.resetSequence();   // ← сброс
+                VehicleDAO.resetSequence();
 
                 ResponseBuilder.append("Элементы, превышающие заданный, успешно удалены");
             } finally {
@@ -356,7 +342,7 @@ public class CollectionManager {
         return C;
     }
 
-    // ====================== АВТОРИЗАЦИЯ ======================
+
 
     public static void setCurrentUser(String login) {
         currentUserLogin = login;
@@ -373,7 +359,7 @@ public class CollectionManager {
         return UserDAO.getUserIdByLogin(currentUserLogin);
     }
 
-    // ====================== СТАРАЯ ЛОГИКА (полностью сохранена) ======================
+
 
     public void initializeArrayId() {
         arrayId.clear();
@@ -384,11 +370,11 @@ public class CollectionManager {
         Collections.sort(arrayId);
     }
 
-    public void setCollection(Stack<Vehicle> c) {
-        this.C = c != null ? c : new Stack<>();
+    public void setC(CopyOnWriteArrayList<Vehicle> c) {
+        C = c;
     }
 
-    public Stack<Vehicle> getCollection() {
+    public CopyOnWriteArrayList<Vehicle> getCollection() {
         return C;
     }
 
@@ -424,21 +410,9 @@ public class CollectionManager {
         ResponseBuilder.append(elements);
     }
 
-    /**
-     * Улучшенный show с поддержкой пагинации
-     * show          -> все элементы (старая логика)
-     * show 2        -> вторая страница (по 10 элементов)
-     */
-    /**
-     * Пагинированный show с подсказкой
-     * show          -> все элементы
-     * show 2        -> вторая страница
-     */
-    /**
-     * Пагинированный show с информацией о страницах
-     * show          -> все элементы + информация о страницах
-     * show 2        -> вторая страница + информация о страницах
-     */
+
+
+
     public String show(String argument) {
         lock.lock();
         try {
@@ -450,7 +424,7 @@ public class CollectionManager {
             int page = 1;
             boolean isPagination = false;
 
-            // Обработка аргумента (номер страницы)
+
             if (argument != null && !argument.trim().isEmpty()) {
                 try {
                     page = Integer.parseInt(argument.trim());
@@ -468,7 +442,7 @@ public class CollectionManager {
             StringBuilder sb = new StringBuilder();
 
             if (isPagination) {
-                // Пагинированный вывод
+
                 if (page > totalPages) {
                     sb.append(String.format("Страница %d не существует.\n", page));
                 } else {
@@ -483,14 +457,14 @@ public class CollectionManager {
                     }
                 }
             } else {
-                // Вывод всех элементов (старая логика)
+
                 sb.append(String.format("Элементы коллекции (всего: %d):\n\n", total));
                 for (Vehicle v : C) {
                     sb.append(v).append("\n");
                 }
             }
 
-            // === Всегда показываем информацию о страницах ===
+
             sb.append("\n").append("=".repeat(60)).append("\n");
             sb.append(String.format("Всего элементов: %d | Страниц: %d (по %d элементов)\n",
                     total, totalPages, pageSize));
@@ -530,7 +504,7 @@ public class CollectionManager {
         ResponseBuilder.append("Количество колес по убыванию: " + wheels);
     }
 
-    public Stack<Vehicle> reorderCollection() {
+    public CopyOnWriteArrayList<Vehicle> reorderCollection() {
         List<Vehicle> list = new ArrayList<>(C);
         Collections.reverse(list);
         C.clear();
@@ -539,7 +513,7 @@ public class CollectionManager {
         return C;
     }
 
-    public Stack<Vehicle> sortCollection() {
+    public CopyOnWriteArrayList<Vehicle> sortCollection() {
         List<Vehicle> list = new ArrayList<>(C);
         Collections.sort(list);
         C.clear();

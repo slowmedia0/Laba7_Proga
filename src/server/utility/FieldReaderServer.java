@@ -73,10 +73,10 @@ public class FieldReaderServer {
             }
 
             if (data.isEmpty() || data.equalsIgnoreCase("NULL") || data.equalsIgnoreCase("null")) {
-                // В ЛР7 ID генерируется базой данных (sequence)
+                
                 id = null;
             } else {
-                // Пользователь явно ввёл id (например, для update)
+                
                 BigDecimal a;
                 try {
                     data = data.replace(",", ".").trim();
@@ -102,7 +102,7 @@ public class FieldReaderServer {
                 id = Integer.valueOf(data);
             }
 
-            // Валидация (для update)
+            
             if (id != null) {
                 ValidatorServer.validateIdVehicle(id);
             }

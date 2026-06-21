@@ -1002,7 +1002,7 @@ public class FieldReaderClient {
         }
     }
 
-    // ====================== LOGIN / REGISTER ======================
+    
 
     public static String askLogin() {
         try {

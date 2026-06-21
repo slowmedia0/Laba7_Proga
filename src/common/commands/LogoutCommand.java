@@ -32,9 +32,7 @@ public class LogoutCommand extends AbstractCommand {
         if (!valid.equals(ExitCodeCommand.OK)) {
             return valid;
         }
-
-        CollectionManager.setCurrentUser(null);
-        ResponseBuilder.append("✅ Вы успешно вышли из аккаунта.");
+        ResponseBuilder.append(" Вы успешно вышли из аккаунта.");
         return ExitCodeCommand.OK;
     }
 

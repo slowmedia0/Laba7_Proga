@@ -18,7 +18,13 @@ public class App {
             System.out.println("Завершение работы сервера");
         }));
 
-        Integer port = args.length > 0 ? Integer.parseInt(args[0]) : 2222;
+
+        if (args.length != 1) {
+            System.out.println("Необходимо указать один аргумент!");
+            System.exit(1);
+        }
+
+        Integer port = FieldReaderServer.readPort(args[0]);
 
         try {
             DatabaseManager.connect();
@@ -29,7 +35,7 @@ public class App {
 
             CollectionManager collectionManager = new CollectionManager();
 
-            // === Создание ExitCommand с CollectionManager ===
+
             ExitCommand exitCommand = new ExitCommand();
             exitCommand.setCollectionManager(collectionManager);
 
@@ -42,7 +48,7 @@ public class App {
                     new RemoveByIdCommand(collectionManager),
                     new ClearCommand(collectionManager),
                     new ExecuteScriptCommand(),
-                    exitCommand,                                   // ← используем созданный экземпляр
+                    exitCommand,
                     new RemoveGreaterCommand(collectionManager),
                     new ReorderCommand(collectionManager),
                     new SortCommand(collectionManager),

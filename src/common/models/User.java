@@ -9,7 +9,7 @@ public class User implements Serializable {
     private String passwordHash;
     private LocalDateTime createdAt;
 
-    // Конструкторы
+    
     public User() {}
 
     public User(String login, String passwordHash) {
@@ -17,7 +17,7 @@ public class User implements Serializable {
         this.passwordHash = passwordHash;
     }
 
-    // getters & setters
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

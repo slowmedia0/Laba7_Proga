@@ -38,13 +38,13 @@ public class ExitCommand extends AbstractCommand {
             return valid;
         }
 
-        // === Явное сохранение ===
+        
         if (collectionManager != null) {
-            System.out.println("💾 Выполняется сохранение коллекции в базу данных...");
+            System.out.println(" Выполняется сохранение коллекции в базу данных...");
             SaveCommand saveCommand = new SaveCommand(collectionManager);
             saveCommand.execute();
         } else {
-            System.out.println("⚠️ Warning: collectionManager is null in ExitCommand");
+            System.out.println(" Warning: collectionManager is null in ExitCommand");
         }
 
         ResponseBuilder.append("Клиент завершает работу.");

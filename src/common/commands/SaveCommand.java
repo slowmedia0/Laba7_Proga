@@ -17,11 +17,11 @@ public class SaveCommand extends AbstractCommand {
     public ExitCodeCommand execute() {
         boolean success = collectionManager.saveToDatabase();
         if (success) {
-            ResponseBuilder.append("✅ Коллекция успешно сохранена в базу данных.");
-            System.out.println("✅ Коллекция успешно сохранена в БД.");
+            ResponseBuilder.append(" Коллекция успешно сохранена в базу данных.");
+            System.out.println(" Коллекция успешно сохранена в БД.");
         } else {
-            ResponseBuilder.append("❌ Не удалось сохранить коллекцию в БД.");
-            System.err.println("❌ Не удалось сохранить коллекцию в БД.");
+            ResponseBuilder.append(" Не удалось сохранить коллекцию в БД.");
+            System.out.println(" Не удалось сохранить коллекцию в БД.");
         }
         return ExitCodeCommand.OK;
     }

@@ -8,6 +8,7 @@ import java.io.File;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class ValidatorClient {
@@ -52,7 +53,7 @@ public class ValidatorClient {
     }
 
     
-    public static boolean validateIdVehicle(Integer id, Stack<Vehicle> C) throws ValidateDataException {
+    public static boolean validateIdVehicle(Integer id, CopyOnWriteArrayList<Vehicle> C) throws ValidateDataException {
         try {
             if (id==null){
                 throw new NullPointerException("Поле 'id' не может быть null!");

@@ -11,10 +11,15 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.Selector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RequestHandler {
 
     private static final int BUFFER_SIZE = 262144;
+
+    
+    private static final ExecutorService processingPool = Executors.newFixedThreadPool(10);
 
     public static void handleRequest(DatagramChannel channel, Selector selector, Console console) {
         SocketAddress clientAddress = null;
@@ -43,18 +48,33 @@ public class RequestHandler {
 
             System.out.println("<- Принят запрос: " + request.getCommandName() + " от " + clientAddress);
 
-            Response response = processCommand(request, console);
-            ResponseSender.sendResponse(channel, clientAddress, response);
+            
+            final SocketAddress finalClientAddress = clientAddress;
+            final CommandRequest finalRequest = request;
+
+            processingPool.submit(() -> {
+                Response response = processCommand(finalRequest, console);   
+
+                new Thread(() -> {
+                    try {
+                        ResponseSender.sendResponse(channel, finalClientAddress, response); 
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
-            ResponseBuilder.appendLn("Критическая ошибка сервера: " + e.getMessage());
-            Response errorResponse = new Response(ExitCodeCommand.ERROR, ResponseBuilder.getOutput());
-            try {
-                if (clientAddress != null) {
-                    ResponseSender.sendResponse(channel, clientAddress, errorResponse);
-                }
-            } catch (Exception ignored) {}
+            if (clientAddress != null) {
+                final SocketAddress finalClientAddress = clientAddress;
+                new Thread(() -> {
+                    try {
+                        Response errorResponse = new Response(ExitCodeCommand.ERROR, "Критическая ошибка сервера");
+                        ResponseSender.sendResponse(channel, finalClientAddress, errorResponse);
+                    } catch (Exception ignored) {}
+                }).start();
+            }
         }
         ResponseBuilder.clear();
     }
@@ -66,7 +86,6 @@ public class RequestHandler {
 
             ExitCodeCommand result;
 
-            // Специальная обработка для login и register
             if ("login".equalsIgnoreCase(commandName)) {
                 result = console.launchCommand(commandName, argument, null, null, null,
                         request.getLogin(), request.getPassword());
@@ -76,7 +95,7 @@ public class RequestHandler {
                         request.getLogin(), request.getPassword());
             }
             else if (request.getVehicleArgument() != null) {
-                result = console.launchCommand(commandName, argument, request.getVehicleArgument(), null, null,null,null);
+                result = console.launchCommand(commandName, argument, request.getVehicleArgument(), null, null, null, null);
             }
             else {
                 result = console.launchCommand(commandName, argument);

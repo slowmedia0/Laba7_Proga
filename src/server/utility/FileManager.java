@@ -19,6 +19,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class FileManager {
@@ -44,8 +45,8 @@ public class FileManager {
         this.collectionManager = collectionManager;
     }
 
-    public Stack<Vehicle> readCollection(File loadFile) throws IOException, ParserConfigurationException, SAXException {
-        Stack<Vehicle> C = new Stack<>();
+    public CopyOnWriteArrayList<Vehicle> readCollection(File loadFile) throws IOException, ParserConfigurationException, SAXException {
+        CopyOnWriteArrayList<Vehicle> C = new CopyOnWriteArrayList<>();
         HashSet<String> setOfId = new HashSet<>();
         String nameOfFile;
         if (loadFile == null){
@@ -165,7 +166,7 @@ public class FileManager {
     }
 
     public boolean writeCollection() {
-        Stack<Vehicle> C = collectionManager.getCollection();
+        CopyOnWriteArrayList<Vehicle> C = collectionManager.getCollection();
         File file = this.loadFile;
 
         StringBuilder xml = new StringBuilder();

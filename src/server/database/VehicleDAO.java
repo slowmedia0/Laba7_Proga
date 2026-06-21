@@ -8,10 +8,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class VehicleDAO {
 
-    // ====================== ЗАГРУЗКА ======================
+    
     public static List<Vehicle> loadAll() {
         List<Vehicle> vehicles = new ArrayList<>();
         String sql = """
@@ -29,7 +30,7 @@ public class VehicleDAO {
                 vehicles.add(mapToVehicle(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Ошибка загрузки коллекции из БД: " + e.getMessage());
+            System.out.println("Ошибка загрузки коллекции из БД: " + e.getMessage());
         }
         return vehicles;
     }
@@ -62,7 +63,7 @@ public class VehicleDAO {
         return vehicle;
     }
 
-    // ====================== ДОБАВЛЕНИЕ ======================
+    
     public static boolean add(Vehicle vehicle, Long ownerId) {
         if (vehicle == null || ownerId == null) return false;
 
@@ -92,18 +93,18 @@ public class VehicleDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int newId = rs.getInt("id");
-                    vehicle.setId(newId);        // ← обязательно!
-                    System.out.println("✅ Добавлен объект с id = " + newId);
+                    vehicle.setId(newId);        
+                    System.out.println(" Добавлен объект с id = " + newId);
                     return true;
                 }
             }
         } catch (Exception e) {
-            System.err.println("Ошибка добавления в БД: " + e.getMessage());
+            System.out.println("Ошибка добавления в БД: " + e.getMessage());
         }
         return false;
     }
 
-    // ====================== ОБНОВЛЕНИЕ ======================
+    
     public static boolean update(Integer id, Vehicle vehicle, Long ownerId) {
         if (id == null || vehicle == null || ownerId == null) return false;
 
@@ -136,12 +137,12 @@ public class VehicleDAO {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Ошибка обновления в БД: " + e.getMessage());
+            System.out.println("Ошибка обновления в БД: " + e.getMessage());
             return false;
         }
     }
 
-    // ====================== УДАЛЕНИЕ ======================
+    
     public static boolean removeById(Integer id, Long ownerId) {
         if (id == null || ownerId == null) return false;
 
@@ -154,12 +155,12 @@ public class VehicleDAO {
             ps.setLong(2, ownerId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Ошибка удаления из БД: " + e.getMessage());
+            System.out.println("Ошибка удаления из БД: " + e.getMessage());
             return false;
         }
     }
 
-    // ====================== ОЧИСТКА ======================
+    
     public static boolean clear(Long ownerId) {
         if (ownerId == null) return false;
 
@@ -172,15 +173,13 @@ public class VehicleDAO {
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            System.err.println("Ошибка очистки БД: " + e.getMessage());
+            System.out.println("Ошибка очистки БД: " + e.getMessage());
             return false;
         }
     }
 
 
-    /**
-     * remove_greater — удаляет все элементы пользователя, которые больше заданного
-     */
+    
     public static boolean removeGreater(Vehicle vehicle, Long ownerId) {
         if (vehicle == null || ownerId == null) return false;
 
@@ -204,24 +203,18 @@ public class VehicleDAO {
             return true;
 
         } catch (SQLException e) {
-            System.err.println("Ошибка remove_greater в БД: " + e.getMessage());
+            System.out.println("Ошибка remove_greater в БД: " + e.getMessage());
             return false;
         }
     }
 
 
-    /**
-     * Полная синхронизация: удаляем всё старое у пользователя и вставляем текущее состояние из памяти
-     */
-    /**
-     * Умное сохранение:
-     * - Существующие объекты (с id) → UPDATE
-     * - Новые объекты (без id) → INSERT
-     */
-    public static boolean saveAll(Stack<Vehicle> vehicles) {
+    
+    
+    public static boolean saveAll(CopyOnWriteArrayList<Vehicle> vehicles) {
         String currentLogin = CollectionManager.getCurrentUserLogin();
         if (currentLogin == null || currentLogin.isEmpty()) {
-            System.err.println("⚠️ saveAll: currentUserLogin is null");
+            System.out.println(" saveAll: currentUserLogin is null");
             return false;
         }
 
@@ -230,7 +223,7 @@ public class VehicleDAO {
             conn = DatabaseManager.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Обновляем существующие объекты (по ID)
+            
             String updateSql = """
                 UPDATE vehicles 
                 SET name = ?, x = ?, y = ?, engine_power = ?, 
@@ -263,7 +256,7 @@ public class VehicleDAO {
                 ps.executeBatch();
             }
 
-            // 2. Добавляем новые объекты (id == null)
+            
             String insertSql = """
                 INSERT INTO vehicles 
                 (owner_id, name, x, y, creation_date, engine_power, 
@@ -293,7 +286,7 @@ public class VehicleDAO {
                         try (ResultSet rs = ps.executeQuery()) {
                             if (rs.next()) {
                                 v.setId(rs.getInt("id"));
-                                System.out.println("✅ Новый объект добавлен с ID = " + v.getId());
+                                System.out.println(" Новый объект добавлен с ID = " + v.getId());
                             }
                         }
                     }
@@ -301,11 +294,11 @@ public class VehicleDAO {
             }
 
             conn.commit();
-            System.out.println("✅ Коллекция успешно синхронизирована (существующие ID сохранены)");
+            System.out.println(" Коллекция успешно синхронизирована (существующие ID сохранены)");
             return true;
 
         } catch (Exception e) {
-            System.err.println("❌ Ошибка saveAll: " + e.getMessage());
+            System.out.println(" Ошибка saveAll: " + e.getMessage());
             e.printStackTrace();
             try { if (conn != null) conn.rollback(); } catch (Exception ignored) {}
             return false;
@@ -314,12 +307,8 @@ public class VehicleDAO {
         }
     }
 
-    /**
-     * Синхронизирует sequence с максимальным id в таблице
-     */
-    /**
-     * Жёстко синхронизирует sequence с максимальным ID в таблице
-     */
+    
+    
     public static void resetSequence() {
         String sql = """
             SELECT setval('vehicles_id_seq', 
@@ -331,10 +320,9 @@ public class VehicleDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.execute();
-            System.out.println("🔄 Sequence успешно сброшен на актуальный MAX(id)");
 
         } catch (SQLException e) {
-            System.err.println("Не удалось сбросить sequence: " + e.getMessage());
+            System.out.println("Не удалось сбросить sequence: " + e.getMessage());
         }
     }
 }

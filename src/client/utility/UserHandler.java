@@ -37,7 +37,7 @@ public class UserHandler {
         this.ExitCodeCommandStatus = ExitCodeCommandStatus;
     }
 
-    // Добавь геттер
+    
     public boolean isExiting() {
         return isExiting;
     }
@@ -177,7 +177,7 @@ public class UserHandler {
         if (response != null && response.isSuccess()) {
             this.currentLogin = null;
             this.currentPassword = null;
-            System.out.println("✅ Вы вышли из аккаунта.");
+            System.out.println(" Вы вышли из аккаунта.");
             return true;
         }
         return false;
@@ -223,11 +223,11 @@ public class UserHandler {
             Response response = sendAndCheck(request);
 
             if (response == null) {
-                System.out.println("❌ Не удалось связаться с сервером.");
+                System.out.println(" Не удалось связаться с сервером.");
                 return false;
             }
 
-            // Выводим сообщение от сервера
+            
             if (response.getMessage() != null && !response.getMessage().trim().isEmpty()) {
                 System.out.println(response.getMessage());
             }
@@ -245,7 +245,7 @@ public class UserHandler {
             handleExitResponse(null);
             return false;
         } catch (Exception e) {
-            System.out.println("❌ Не удалось связаться с сервером.");
+            System.out.println(" Не удалось связаться с сервером.");
             return false;
         }
     }
@@ -264,11 +264,11 @@ public class UserHandler {
             Response response = sendAndCheck(request);
 
             if (response == null) {
-                System.out.println("❌ Не удалось связаться с сервером.");
+                System.out.println(" Не удалось связаться с сервером.");
                 return false;
             }
 
-            // Выводим сообщение от сервера (единственный раз)
+            
             if (response.getMessage() != null && !response.getMessage().trim().isEmpty()) {
                 System.out.println(response.getMessage());
             }
@@ -286,7 +286,7 @@ public class UserHandler {
             handleExitResponse(null);
             return false;
         } catch (Exception e) {
-            System.out.println("❌ Не удалось связаться с сервером.");
+            System.out.println(" Не удалось связаться с сервером.");
             return false;
         }
     }
@@ -332,11 +332,10 @@ public class UserHandler {
     public void interactiveMode() {
         flagReadCollection = false;
 
-        // Первоначальная авторизация
+        
         if (currentLogin == null) {
             boolean authSuccess = loginOrRegister();
             if (!authSuccess) {
-                // Если Ctrl+D во время авторизации — сразу выходим
                 return;
             }
         }
@@ -369,7 +368,7 @@ public class UserHandler {
                     continue;
                 }
 
-                if (currentLogin == null && !isAuthCommand(mnemonics)) {
+                if (currentLogin == null & !isAuthCommand(mnemonics)) {
                     System.out.println("Ошибка: Вы не авторизованы. Используйте команды login или register.");
                     continue;
                 }
@@ -401,6 +400,10 @@ public class UserHandler {
 
                 if (response != null && response.getMessage() != null && !response.getMessage().isEmpty()) {
                     System.out.println(response.getMessage());
+                    if (response.isSuccess() & (request.getNameOfCommand().equals("register") | request.getNameOfCommand().equals("login"))){
+                        this.currentLogin=request.getLogin();
+                        this.currentPassword=request.getPassword();
+                    }
                 }
             }
         } catch (NoSuchElementException e) {
@@ -516,7 +519,7 @@ public class UserHandler {
             return request;
         }
 
-        // Для остальных команд
+        
         switch (cmdName) {
             case "help", "remove_by_id", "exit", "logout", "info", "show", "clear", "reorder", "sort",
                  "sum_of_engine_power", "print_field_ascending_number_of_wheels",
@@ -540,7 +543,7 @@ public class UserHandler {
                 request = new CommandRequest(cmdName, command.getArgument());
         }
 
-        // Добавляем текущие credentials для обычных команд
+        
         if (currentLogin != null && currentPassword != null &&
                 !"login".equals(cmdName) && !"register".equals(cmdName)) {
             request.setLogin(currentLogin);
@@ -563,8 +566,7 @@ public class UserHandler {
         System.out.println("Клиент завершает работу.");
     }
     private boolean isAuthCommand(String cmd) {
-        return "login".equalsIgnoreCase(cmd) ||
-                "register".equalsIgnoreCase(cmd) ||
+        return "login".equalsIgnoreCase(cmd)  || "register".equalsIgnoreCase(cmd) ||
                 "logout".equalsIgnoreCase(cmd);
     }
 }

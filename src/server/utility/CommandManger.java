@@ -29,7 +29,7 @@ public class CommandManger {
     private final PrintFieldAscendingNumberOfWheelsCommand printFieldAscendingNumberOfWheelsCommand;
     private final PrintFieldDescendingNumberOfWheelsCommand printFieldDescendingNumberOfWheelsCommand;
 
-    // === Команды ЛР7 ===
+    
     private final LoginCommand loginCommand;
     private final RegisterCommand registerCommand;
     private final LogoutCommand logoutCommand;
@@ -76,7 +76,7 @@ public class CommandManger {
                 "logout".equalsIgnoreCase(mnemonics);
     }
 
-    // ====================== AUTH МЕТОДЫ С LOGIN/PASSWORD ======================
+    
     public ExitCodeCommand login(String argument, String login, String password) {
         loginCommand.setArgument(argument);
         if (loginCommand instanceof LoginCommand) {
@@ -100,7 +100,7 @@ public class CommandManger {
         return logoutCommand.execute();
     }
 
-    // ====================== EXECUTE ДЛЯ СКРИПТОВ ======================
+    
     public ExitCodeCommand execute(String mnemonics, String argument) throws CommandNotExist {
         if (isAuthCommand(mnemonics)) {
             if ("login".equalsIgnoreCase(mnemonics)) return login(argument, "", "");
@@ -131,7 +131,7 @@ public class CommandManger {
         }
     }
 
-    // ====================== EXECUTE ДЛЯ ИНТЕРАКТИВНОГО РЕЖИМА ======================
+    
     public ExitCodeCommand execute(String mnemonics, String argument, Vehicle vehicle, String FileName, byte[] FileData) throws CommandNotExist {
         if (isAuthCommand(mnemonics)) {
             if ("login".equalsIgnoreCase(mnemonics)) return login(argument, "", "");
@@ -162,8 +162,9 @@ public class CommandManger {
         }
     }
 
-    // ====================== EXECUTE С LOGIN/PASSWORD ======================
+    
     public ExitCodeCommand execute(String mnemonics, String argument, Vehicle vehicle, String FileName, byte[] FileData, String login, String password) throws CommandNotExist {
+
         if ("login".equalsIgnoreCase(mnemonics)) {
             return login(argument, login, password);
         }
@@ -174,11 +175,11 @@ public class CommandManger {
             return logout(argument);
         }
 
-        // Для остальных команд вызываем обычную перегрузку
+        
         return execute(mnemonics, argument, vehicle, FileName, FileData);
     }
 
-    // ====================== ОСТАЛЬНЫЕ МЕТОДЫ ======================
+    
     public ExitCodeCommand help(String argument){
         helpCommand.setCommands(commands);
         helpCommand.setArgument(argument);
@@ -255,7 +256,7 @@ public class CommandManger {
         return printFieldDescendingNumberOfWheelsCommand.execute();
     }
 
-    // ====================== ПЕРЕГРУЖЕННЫЕ ВЕРСИИ ======================
+    
     public ExitCodeCommand help(String argument, Vehicle vehicle, String FileName, byte[] FileData){
         helpCommand.setCommands(commands);
         helpCommand.setArgument(argument);

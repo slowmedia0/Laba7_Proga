@@ -47,12 +47,6 @@ public class RegisterCommand extends AbstractCommand {
             return valid;
         }
 
-        // Проверка: если уже авторизован
-        if (CollectionManager.getCurrentUserLogin() != null) {
-            ResponseBuilder.append("Вы уже авторизованы. Для регистрации сначала выйдите с помощью команды 'logout'.");
-            return ExitCodeCommand.ERROR;
-        }
-
         if (login == null || password == null || login.trim().isEmpty() || password.trim().isEmpty()) {
             ResponseBuilder.append("Логин и пароль не могут быть пустыми");
             return ExitCodeCommand.ERROR;
@@ -60,12 +54,13 @@ public class RegisterCommand extends AbstractCommand {
 
         boolean success = UserDAO.register(login, password);
         if (success) {
-            ResponseBuilder.append("✅ Регистрация прошла успешно!");
-            ResponseBuilder.append("✅ Вы автоматически вошли как " + login);
+            ResponseBuilder.append(" Регистрация прошла успешно!");
+            ResponseBuilder.append(" Вы автоматически вошли как " + login);
             CollectionManager.setCurrentUser(login);
+            CollectionManager.setCurrentUserLogin(login);
             return ExitCodeCommand.OK;
         } else {
-            ResponseBuilder.append("❌ Ошибка регистрации (возможно, такой логин уже занят)");
+            ResponseBuilder.append(" Ошибка регистрации (возможно, такой логин уже занят)");
             return ExitCodeCommand.ERROR;
         }
     }

@@ -15,7 +15,7 @@ PLASMA
 show
 sort
 show
-execute_script src\script1.txt
+execute_script /mnt/c/Users/kosel/IdeaProjects/Laba7_Proga/src/script1.txt
 reorder
 sum_of_engine_power
 print_field_ascending_number_of_wheels

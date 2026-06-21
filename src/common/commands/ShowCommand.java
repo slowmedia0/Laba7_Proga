@@ -38,7 +38,7 @@ public class ShowCommand extends AbstractCommand {
 
     @Override
     public ExitCodeCommand validate() {
-        // Разрешаем аргумент (номер страницы), но проверяем, что он корректный
+        
         try {
             if (!argument.isEmpty()) {
                 try {
@@ -70,7 +70,7 @@ public class ShowCommand extends AbstractCommand {
                 throw new WrongAmountOfElementsException("Коллекция пуста!");
             }
 
-            // Вызываем новый метод с пагинацией
+            
             String output = collectionManager.show(argument);
             ResponseBuilder.append(output);
             return ExitCodeCommand.OK;
